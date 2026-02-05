@@ -1,0 +1,36 @@
+
+## PROBLEM STATEMENT ##
+
+A binary tree is uni-valued if every node in the tree has the same value.
+Given the root of a binary tree, return true if the given tree is uni-valued, or false otherwise.
+Example 1:
+Input: root = [1,1,1,1,1,null,1]
+Output: true
+Example 2:
+Input: root = [2,2,2,5,2]
+Output: false
+Constraints:
+The number of nodes in the tree is in the range [1, 100].
+0 <= Node.val < 100
+
+## SOLUTION ##
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def isUnivalTree(self, root: TreeNode) -> bool:
+        if not root:
+            return True
+        
+        if root.left and root.val != root.left.val:
+            return False
+            
+        if root.right and root.val != root.right.val:
+            return False
+        
+        return self.isUnivalTree(root.left) and self.isUnivalTree(root.right)
