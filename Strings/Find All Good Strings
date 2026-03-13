@@ -1,0 +1,69 @@
+
+## PROBLEM STATEMENT ##
+
+Given the strings s1 and s2 of size n and the string evil, return the number of good strings.
+A good string has size n, it is alphabetically greater than or equal to s1, it is alphabetically smaller than or equal to s2, and it does not contain the string evil as a substring. Since the answer can be a huge number, return this modulo 109 + 7.
+Example 1:
+Input: n = 2, s1 = "aa", s2 = "da", evil = "b"
+Output: 51 
+Explanation: There are 25 good strings starting with 'a': "aa","ac","ad",...,"az". Then there are 25 good strings starting with 'c': "ca","cc","cd",...,"cz" and finally there is one good string starting with 'd': "da". 
+Example 2:
+Input: n = 8, s1 = "leetcode", s2 = "leetgoes", evil = "leet"
+Output: 0 
+Explanation: All strings greater than or equal to s1 and smaller than or equal to s2 start with the prefix "leet", therefore, there is not any good string.
+Example 3:
+Input: n = 2, s1 = "gx", s2 = "gz", evil = "x"
+Output: 2
+Constraints:
+s1.length == n
+s2.length == n
+s1 <= s2
+1 <= n <= 500
+1 <= evil.length <= 50
+All strings consist of lowercase English letters.
+
+## SOLUTION ##
+
+class Solution:
+    def findGoodStrings(self, n: int, s1: str, s2: str, evil: str) -> int:
+        mod = 10 ** 9 + 7
+        def convert_str_to_num(s: str) -> int:
+            return ord(s) - ord("a")
+        
+        num1, num2, evil_num = list(map(convert_str_to_num, s1)), tuple(map(convert_str_to_num, s2)), tuple(map(convert_str_to_num, evil))
+        def prefix_function(tup: tuple) -> List[int]:
+            l = len(tup)
+            lps = [0 for _ in range(l)]
+            for i in range(1, l):
+                j = lps[i - 1]
+                while j > 0 and tup[i] != tup[j]: j = lps[j - 1]
+                if tup[i] == tup[j]: j += 1
+                lps[i] = j
+            return lps
+
+        kmp = prefix_function(evil_num)
+
+        @cache
+        def dp(pos: int, tight: True, match_number: int, num: tuple) -> int:
+            if match_number == len(evil_num): return 0
+            if pos == n: return 1
+            res = 0
+            bound = num[pos] if tight else 26
+            for i in range(bound + 1):
+                if i == 26: continue
+                new_tight = i == bound
+                j = match_number
+                while j > 0 and evil_num[j] != i:
+                    j = kmp[j - 1]
+                if evil_num[j] == i: j += 1
+                res = (res + dp(pos + 1, new_tight, j, num))
+            return res % mod
+
+        i = n - 1
+        while i >= 0 and num1[i] == 0:
+            num1[i] = 25
+            i -= 1
+        if i >= 0: num1[i] -= 1
+        else: return dp(0, True, 0, num2) % mod
+        
+        return (dp(0, True, 0, num2) - dp(0, True, 0, tuple(num1))) % mod
