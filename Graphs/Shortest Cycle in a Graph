@@ -1,0 +1,55 @@
+
+## PROBLEM STATEMENT ##
+
+There is a bi-directional graph with n vertices, where each vertex is labeled from 0 to n - 1. The edges in the graph are represented by a given 2D integer array edges, where edges[i] = [ui, vi] denotes an edge between vertex ui and vertex vi. Every vertex pair is connected by at most one edge, and no vertex has an edge to itself.
+Return the length of the shortest cycle in the graph. If no cycle exists, return -1.
+A cycle is a path that starts and ends at the same node, and each edge in the path is used only once.
+Example 1:
+Input: n = 7, edges = [[0,1],[1,2],[2,0],[3,4],[4,5],[5,6],[6,3]]
+Output: 3
+Explanation: The cycle with the smallest length is : 0 -> 1 -> 2 -> 0 
+Example 2:
+Input: n = 4, edges = [[0,1],[0,2]]
+Output: -1
+Explanation: There are no cycles in this graph.
+Constraints:
+2 <= n <= 1000
+1 <= edges.length <= 1000
+edges[i].length == 2
+0 <= ui, vi < n
+ui != vi
+There are no repeated edges.
+
+## SOLUTION ##
+
+from collections import deque
+
+class Solution:
+    def __init__(self):
+        self.min_len = float('inf')
+    def find_min_cycle(self, adj, cur, visit):
+        dis = [-1] * len(visit)
+        Q = deque([(cur, -1)])  # (node, parent)
+        visit[cur] = 0
+        dis[cur] = 0
+        while Q:
+            t, p = Q.popleft()
+            cur_dis = dis[t]
+            for neighbor in adj[t]:
+                if neighbor == p:
+                    continue
+                elif dis[neighbor] != -1:
+                    self.min_len = min(self.min_len, dis[neighbor] + dis[t] + 1)
+                    continue
+                dis[neighbor] = cur_dis + 1
+                Q.append((neighbor, t))
+    def findShortestCycle(self, n, edges):
+        visit = [-1] * n
+        adj = [[] for _ in range(n)]
+        for u, v in edges:
+            adj[u].append(v)
+            adj[v].append(u)
+        for i in range(n):
+            if visit[i] == -1:
+                self.find_min_cycle(adj, i, visit)
+        return self.min_len if self.min_len != float('inf') else -1
