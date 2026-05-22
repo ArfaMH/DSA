@@ -1,0 +1,38 @@
+
+## PROBLEM STATEMENT ##
+
+You are given a positive integer n.
+A binary string x is valid if all substrings of x of length 2 contain at least one "1".
+Return all valid strings with length n, in any order.
+Example 1:
+Input: n = 3
+Output: ["010","011","101","110","111"]
+Explanation:
+The valid strings of length 3 are: "010", "011", "101", "110", and "111".
+Example 2:
+Input: n = 1
+Output: ["0","1"]
+Explanation:
+The valid strings of length 1 are: "0" and "1".
+Constraint
+1 <= n <= 18
+
+## SOLUTION ##
+
+class Solution:
+    def __init__(self):
+        self.ans = []
+
+    def f(self, prev: int, str_: str, n: int):
+        if len(str_) == n:
+            self.ans.append(str_)
+            return
+        self.f(1, str_ + '1', n)
+        if prev == 1:
+            self.f(0, str_ + '0', n)
+
+    def validStrings(self, n: int) -> List[str]:
+        self.ans = []
+        self.f(0, "0", n)
+        self.f(1, "1", n)
+        return self.ans
