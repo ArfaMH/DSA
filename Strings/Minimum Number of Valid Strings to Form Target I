@@ -1,0 +1,85 @@
+
+
+## PROBLEM STATEMENT ##
+
+You are given an array of strings words and a string target.
+A string x is called valid if x is a prefix of any string in words.
+Return the minimum number of valid strings that can be concatenated to form target. If it is not possible to form target, return -1.
+Example 1:
+Input: words = ["abc","aaaaa","bcdef"], target = "aabcdabc"
+Output: 3
+Explanation:
+The target string can be formed by concatenating:
+Prefix of length 2 of words[1], i.e. "aa".
+Prefix of length 3 of words[2], i.e. "bcd".
+Prefix of length 3 of words[0], i.e. "abc".
+Example 2:
+Input: words = ["abababab","ab"], target = "ababaababa"
+Output: 2
+Explanation:
+The target string can be formed by concatenating:
+Prefix of length 5 of words[0], i.e. "ababa".
+Prefix of length 5 of words[0], i.e. "ababa".
+Example 3:
+Input: words = ["abcdef"], target = "xyz"
+Output: -1
+Constraints:
+1 <= words.length <= 100
+1 <= words[i].length <= 5 * 103
+The input is generated such that sum(words[i].length) <= 105.
+
+## SOLUTION ##
+
+class TrieNode:
+    def __init__(self):
+        self.ch = [None] * 26
+        self.isEnd = False
+
+class Solution:
+    def __init__(self):
+        self.dp = [-1] * 10001
+
+    class Trie:
+        def __init__(self):
+            self.root = TrieNode()
+
+        def insert(self, s):
+            t = self.root
+            for c in s:
+                k = ord(c) - ord('a')
+                if not t.ch[k]:
+                    t.ch[k] = TrieNode()
+                t = t.ch[k]
+            t.isEnd = True
+
+        def search(self, s, i, n, dp):
+            if i == n:
+                return 0
+            if dp[i] != -1:
+                return dp[i]
+
+            ans = float('inf')
+            h = self.root
+            for j in range(i, n):
+                k = ord(s[j]) - ord('a')
+                if h.ch[k]:
+                    ans = min(ans, 1 + self.search(s, j + 1, n, dp))
+                    h = h.ch[k]
+                else:
+                    break
+            dp[i] = ans
+            return ans
+
+    def minValidStrings(self, words, s):
+        trie = self.Trie()
+        for word in words:
+            trie.insert(word)
+
+        n = len(s)
+        self.dp = [-1] * (n + 1)
+        result = trie.search(s, 0, n, self.dp)
+        return -1 if result > 10000 else result
+
+words[i] consists only of lowercase English letters.
+1 <= target.length <= 5 * 103
+target consists only of lowercase English letters.
